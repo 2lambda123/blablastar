@@ -17,6 +17,7 @@
 
 
 from __future__ import with_statement
+import defusedxml.ElementTree
 
 
 
@@ -36,7 +37,6 @@ import urllib
 import os
 import itertools
 import types
-import xml.etree.cElementTree as ET
 from . import api_utils
 from . import common
 from . import errors
@@ -210,7 +210,7 @@ def _get_bucket_attribute(bucket,
 
   errors.check_status(status, [200], bucket, resp_headers=headers, body=content)
 
-  root = ET.fromstring(content)
+  root = defusedxml.ElementTree.fromstring(content)
   if root.tag == xml_response_tag and root.text:
     return root.text
   return None
@@ -551,7 +551,7 @@ class _Bucket(object):
       else:
         self._get_bucket_fut = None
 
-      root = ET.fromstring(content)
+      root = defusedxml.ElementTree.fromstring(content)
       dirs = self._next_dir_gen(root)
       files = self._next_file_gen(root)
       next_file = files.next()
@@ -664,7 +664,7 @@ class _Bucket(object):
     """
     element_mapping = {}
     result = StringIO.StringIO(result)
-    for _, e in ET.iterparse(result, events=('end',)):
+    for _, e in defusedxml.ElementTree.iterparse(result, events=('end',)):
       if not elements:
         break
       if e.tag in elements:

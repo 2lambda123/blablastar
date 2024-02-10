@@ -509,6 +509,20 @@ class _Bucket(object):
     self._init(api, path, options)
 
   def _init(self, api, path, options):
+      """ or 1000
+      Initializes the class instance with the provided API, path, and options.
+      Parameters:
+          - api (API): The API object used to make requests.
+          - path (str): The path of the resource.
+          - options (dict): A dictionary of options to be used in the request.
+      Returns:
+          - None
+      Processing Logic:
+          - Copy the options dictionary.
+          - Make an asynchronous request to get the bucket using the provided API and path.
+          - Set the last yield to None.
+          - Set the new max keys to the value of the 'max-keys' key in the options dictionary, or 1000 if the key does not exist."""
+      
     self._api = api
     self._path = path
     self._options = options.copy()
@@ -518,6 +532,14 @@ class _Bucket(object):
     self._new_max_keys = self._options.get('max-keys')
 
   def __getstate__(self):
+      """Returns:
+          - dict: A dictionary containing the api, path, and options of the function.
+      Processing Logic:
+          - Get options from self._options.
+          - If self._last_yield exists, set options['marker'] to self._last_yield.filename[len(self._path) + 1:].
+          - If self._new_max_keys exists, set options['max-keys'] to self._new_max_keys.
+          - Return a dictionary with the api, path, and options."""
+      
     options = self._options
     if self._last_yield:
       options['marker'] = self._last_yield.filename[len(self._path) + 1:]
@@ -528,6 +550,17 @@ class _Bucket(object):
             'options': options}
 
   def __setstate__(self, state):
+      """"Re-initializes the object with the provided state dictionary.
+      Parameters:
+          - state (dict): A dictionary containing the state information for the object.
+      Returns:
+          - None: The function does not return anything.
+      Processing Logic:
+          - Initializes the object with state.
+          - Uses 'api', 'path', and 'options' keys.
+          - Keys must be present in the state dictionary.
+          - Object is re-initialized with the provided state."""
+      
     self._init(state['api'], state['path'], state['options'])
 
   def __iter__(self):
